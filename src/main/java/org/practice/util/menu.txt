@@ -1,0 +1,11 @@
+--- Task Manager ---
+1. Add Task
+2. View Tasks
+3. Remove Task
+4. Update Task
+5. Mark Task as Completed
+6. Sort Tasks by Due Date
+7. Sort Tasks by Priority
+8. Search Task by Title
+9. Start Task
+0. Exit
