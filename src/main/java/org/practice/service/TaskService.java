@@ -2,20 +2,22 @@ package org.practice.service;
 
 import org.practice.entity.Task;
 import org.practice.entity.req.TaskUpdate;
+import org.practice.service.serviceManagement.interfaces.CrudOperation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-public abstract class TaskService {
-    private final List<Task> tasks = new ArrayList<>();
+public abstract class TaskService implements CrudOperation {
+    protected final List<Task> tasks = new ArrayList<>();
 
+    @Override
     public Task addTask(Task task) {
         tasks.add(task);
         return task;
     }
 
+    @Override
     public Task updateTask(UUID id, TaskUpdate task) {
         Task task1 = getTask(id);
         if (task.getTitle() != null) task1.setTitle(task.getTitle());
@@ -25,6 +27,7 @@ public abstract class TaskService {
         return task1;
     }
 
+    @Override
     public UUID removeTask(UUID id) {
         try {
             int indexToRemove = -1;
@@ -46,14 +49,11 @@ public abstract class TaskService {
         }
     }
 
+    @Override
     public Task getTask(UUID id) {
         return tasks.stream()
                 .filter(t -> t.getId().equals(id))
                 .findFirst().orElseThrow(() -> new RuntimeException("Task with id " + id + " doesn't exist"));
-    }
-
-    public List<Task> getTasks() {
-        return this.tasks;
     }
 
     public abstract void displayTasks();

@@ -1,9 +1,11 @@
 package org.practice.controller;
 
-import org.practice.request.RequestImpl;
+import org.practice.repo.TaskRepo;
+import org.practice.repo.TaskRepositoryImpl;
 import org.practice.request.Requests;
-import org.practice.service.TaskService;
-import org.practice.service.TaskServiceImpl;
+import org.practice.request.TaskServiceRequests;
+import org.practice.service.TaskOperationImpl;
+import org.practice.service.serviceManagement.interfaces.CrudOperation;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,20 +13,25 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class TaskController {
-
     private final Scanner scanner = new Scanner(System.in);
-    private final TaskService taskService = new TaskServiceImpl();
-    private final Requests requests = new RequestImpl(taskService);
+    private final CrudOperation crudOperation;
+    private final Requests requests;
+
+    public TaskController() {
+        TaskRepo taskRepo = new TaskRepositoryImpl();
+        this.crudOperation = new TaskOperationImpl(taskRepo);
+        this.requests = new TaskServiceRequests(crudOperation);
+    }
 
     public void start() throws IOException {
         boolean done = false;
         while (!done) {
             getText();
-            String input = scanner.next();
+            String input = scanner.nextLine();
 
             switch (input) {
                 case "0":
-                    System.out.println("bye");
+                    System.out.println("Goodbye!");
                     done = true;
                     break;
                 case "1":
@@ -43,19 +50,19 @@ public class TaskController {
                     System.out.println(requests.markTaskAsCompletedRequest());
                     break;
                 case "6":
-                    taskService.sortByDueDate();
+                    crudOperation.sortByDueDate();
                     break;
                 case "7":
-                    taskService.sortByPriority();
+                    crudOperation.sortByPriority();
                     break;
                 case "8":
-                    taskService.sortByPriorityAndDueDate();
+                    crudOperation.sortByPriorityAndDueDate();
                     break;
                 case "9":
                     System.out.println(requests.startTask());
                     break;
                 default:
-                    System.err.println("bad option");
+                    System.err.println("Invalid option");
                     break;
             }
         }

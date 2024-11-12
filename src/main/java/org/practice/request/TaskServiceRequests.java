@@ -3,37 +3,39 @@ package org.practice.request;
 import org.practice.entity.Task;
 import org.practice.entity.req.TaskUpdate;
 import org.practice.service.TaskService;
-import org.practice.service.TaskServiceImpl;
+import org.practice.service.serviceManagement.interfaces.CrudOperation;
 
 import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class RequestImpl implements Requests {
+public class TaskServiceRequests implements Requests {
 
     private final Scanner scanner = new Scanner(System.in);
-    private final TaskService taskService;
+    private final CrudOperation crudOperation;
 
-    public RequestImpl(TaskService taskService) {
-        this.taskService = taskService;
+    public TaskServiceRequests(CrudOperation crudOperation) {
+        this.crudOperation = crudOperation;
     }
 
     @Override
     public Task createRequest() {
         try {
             System.out.print("Please enter the title of the task: ");
-            String title = scanner.next();
+            String title = scanner.nextLine();
             System.out.print("Please enter the description of the task: ");
-            String description = scanner.next();
+            String description = scanner.nextLine();
             System.out.print("Please enter the priority of the task: ");
             byte priority = (byte) scanner.nextInt();
-            System.out.print("Please enter the due date of the task: ");
-            String dueDate = scanner.next();
+            scanner.nextLine(); // Consume newline
+            System.out.print("Please enter the due date of the task (yyyy-MM-dd): ");
+            String dueDate = scanner.nextLine();
             System.out.print("Please enter the count of the task: ");
             int count = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-            return this.taskService.addTask(new Task.builder()
+            return crudOperation.addTask(new Task.builder()
                     .completed(false)
                     .title(title)
                     .description(description)
@@ -42,7 +44,7 @@ public class RequestImpl implements Requests {
                     .count(count)
                     .build());
         } catch (InputMismatchException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Invalid input: " + e.getMessage());
             return null;
         }
     }
@@ -62,7 +64,7 @@ public class RequestImpl implements Requests {
         System.out.print("Please enter the count of the task: ");
         int count = scanner.nextInt();
 
-        return this.taskService.updateTask(UUID.fromString(uuid),
+        return this.crudOperation.updateTask(UUID.fromString(uuid),
                 new TaskUpdate.builder()
                         .count(count)
                         .title(title)
@@ -77,25 +79,27 @@ public class RequestImpl implements Requests {
     public UUID deleteRequest() {
         System.out.print("Please enter the UUID of the task: ");
         String uuid = scanner.next();
-        return this.taskService.removeTask(UUID.fromString(uuid));
+
+        return this.crudOperation.removeTask(UUID.fromString(uuid));
     }
 
     @Override
     public Task markTaskAsCompletedRequest() {
         System.out.print("Please enter the UUID of the task: ");
         String uuid = scanner.next();
-        return this.taskService.markTaskCompleted(UUID.fromString(uuid));
+
+        return this.crudOperation.markTaskCompleted(UUID.fromString(uuid));
     }
 
     @Override
     public void showAll() {
-        this.taskService.displayTasks();
+        this.crudOperation.displayTasks();
     }
 
     @Override
     public Task startTask() {
         System.out.print("Enter id: ");
         String uuid = scanner.next();
-        return this.taskService.startTask(UUID.fromString(uuid));
+        return this.crudOperation.startTask(UUID.fromString(uuid));
     }
 }
